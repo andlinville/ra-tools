@@ -58,7 +58,7 @@ MeltDischarge <- function(dischargeRaw, fieldNames, dischargeId = FALSE, rowIsDi
   updatedFields <- c('patient_zip', 'msdrg', 'hosp_id', 'discharge_id', 'discharge_count')
   
   # subset the raw data and update field names
-  dataSlice = data[fieldNames]
+  dataSlice <- data[fieldNames]
   
   # attach discharge id and discharge count fields
   if (!dischargeId) {
