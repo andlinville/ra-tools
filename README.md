@@ -1,6 +1,6 @@
 ra-tools
 ========
-ra-tools is a set of tools to help streamline basic hospital merger analysis, providing functions for the following standard analyses:
+ra-tools is a set of tools to help streamline basic hospital merger analysis, providing functions for generating and updating the following standard analyses:
 
 	* geographic market tables (patient origin tables)
 	* market share (HHI) tables
