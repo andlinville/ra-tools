@@ -1,7 +1,0 @@
-GenerateHospNameKey(dischargeRaw) {
-  
-}
-
-GenerateOverlapKey(dischargeRaw) {
-  
-}
