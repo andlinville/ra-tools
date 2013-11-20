@@ -1,7 +1,3 @@
-GenHospNameKey <- function(dischargeRaw) {
-  
-}
-
 GenOverlapKey <- function(dischargeRaw) {
   
 }
