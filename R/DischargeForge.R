@@ -4,21 +4,22 @@ MeltDischarge <- function(dischargeRaw, fieldNames, dischargeId = FALSE, rowIsDi
   # Args:
   #   dischargeRaw: the discharge dataset as a data frame
   #   fieldNames: a vector of the names of the following fields:
-  #     0. patient_zip
-  #     1. msdrg
-  #     2. hospital_id
-  #     3. discharge_id
-  #     4. discharge_count
-  #   If either discharge_id or discharge_count are implied in the data, their
-  #   names should be excluded from the fieldNames argument and the dischargeId
-  #   and rowIsDischarge arguments should be set appropriately (see below).
+  #       0. patient zip code
+  #       1. msdrg
+  #       2. hospital id
+  #       3. payer description
+  #       4. discharge id
+  #       5. discharge count
+  #     If either discharge_id or discharge_count are implied in the data, their
+  #     names should be excluded from the fieldNames argument and the dischargeId
+  #     and rowIsDischarge arguments should be set appropriately (see below).
   #   dischargeId: should be FALSE (default) if a field containing a unique
-  #   identifier for each discharge is included in the fieldNames vector.
-  #   otherwise the field dischargeId should be TRUE.
-  #   rowIsDischarge: should be TRUE if each row in the data is considered a
-  #   unique discharge. Otherwise this argument should be TRUE and a field
-  #   containing a count of discharges for each row should be included in the
-  #   fieldNames vector.
+  #     identifier for each discharge is included in the fieldNames vector.
+  #     otherwise the field dischargeId should be TRUE.
+  #     rowIsDischarge: should be TRUE if each row in the data is considered a
+  #     unique discharge. Otherwise this argument should be TRUE and a field
+  #     containing a count of discharges for each row should be included in the
+  #     fieldNames vector.
   #
   # Returns:
   #   a molten data frame of only those fields from the discharge data that are
@@ -26,39 +27,40 @@ MeltDischarge <- function(dischargeRaw, fieldNames, dischargeId = FALSE, rowIsDi
   
   require(plyr)
   require(reshape2)
-  
+
+  print(class(dischargeRaw))
   # check to see if fieldNames has been properly specified
   if (rowIsDischarge & dischargeId) {
-    if (length(fieldNames) != 4) {
+    if (length(fieldNames) != 5) {
       len = length(fieldNames)
-      message = 'Expected 4 values in the fieldnames vector, found ' + len + ' values'
+      message = paste('Expected 5 values in the fieldnames vector, found', as.character(len), 'values', sep = " ")
       stop(message)
     }
   } else if (rowIsDischarge & !dischargeId) {
-    if (length(fieldNames) != 3) {
+    if (length(fieldNames) != 4) {
       len = length(fieldNames)
-      message = 'Expected 3 values in the fieldnames vector, found ' + len + ' values'
+      message = paste('Expected 4 values in the fieldnames vector, found', as.character(len), 'values', sep = " ")
       stop(message)
     }
   } else if (!rowIsDischarge & !dischargeId) {
-    if (length(fieldNames) != 4) {
+    if (length(fieldNames) != 5) {
       len = length(fieldNames)
-      message = 'Expected 4 values in the fieldnames vector, found ' + len + ' values'
+      message = paste('Expected 5 values in the fieldnames vector, found', as.character(len), 'values', sep = " ")
       stop(message)
     }
   } else if (!rowIsDischarge & dischargeId) {
-    if (length(fieldNames) != 5) {
+    if (length(fieldNames) != 6) {
       len = length(fieldNames)
-      message = 'Expected 5 values in the fieldnames vector, found ' + len + ' values'
+      message = paste('Expected 6 values in the fieldnames vector, found', as.character(len), 'values', sep = " ")
       stop(message)
     }
   }
   
   # store new field names in a vector
-  updatedFields <- c('patient_zip', 'msdrg', 'hosp_id', 'discharge_id', 'discharge_count')
+  updatedFields <- c('patient_zip', 'msdrg', 'hosp_id', 'payer', 'discharge_id', 'discharge_count')
   
   # subset the raw data and update field names
-  dataSlice <- data[fieldNames]
+  dataSlice <- dischargeRaw[, fieldNames]
   
   # attach discharge id and discharge count fields
   if (!dischargeId) {
@@ -71,12 +73,12 @@ MeltDischarge <- function(dischargeRaw, fieldNames, dischargeId = FALSE, rowIsDi
   # melt the subsetted data and return the result
   names(dataSlice) <- updatedFields
   result <- melt(dataSlice,
-                 id = c('discharge_id', 'hosp_id', 'zipcode', 'msdrg'),
+                 id = c('discharge_id', 'hosp_id', 'patient_zip', 'msdrg', 'payer'),
                  measured = c('discharge_count'))
   return(result)
 }
 
-CastDischarge <- function(moltenDischarge, msdrgSubset = "all") {
+CastDischarge <- function(moltenDischarge, payerKey, ...) {
   # Takes in the output of the Discharge Extract function, and reshapes for 
   # discharges by zip code (vertical) and hospital (horizontal).
   #   
@@ -95,15 +97,31 @@ CastDischarge <- function(moltenDischarge, msdrgSubset = "all") {
   require(plyr)
   require(reshape2)
   
-  # merge in zip code key and msdrg key
-  dataWithZipKey <- moltenDischarge
-  fields <- names(dataWithZipKey)
+  # load and merge in zip code key and msdrg key
+  load("data/msdrgKey.Rdata")
+  load("data/zipKey.Rdata")
+  
+  dataWithZipKey <- merge(moltenDischarge,
+                          zipKey,
+                          by.x = c("patient_zip"),
+                          by.y = c("zip_code"),
+                          sort = FALSE) 
+  dataWithMsdrg <- merge(dataWithZipKey,
+                        msdrgKey,
+                        by = c("msdrg"),
+                        sort = FALSE)
+  completeData <- merge(dataWithMsdrg,
+                        payerKey,
+                        by= c('payer'),
+                        sort = FALSE)
   
   # subset the data
-  completeData <- dataWithZipKey
-  subset <- completeData[fields[fields != 'msdrg']]
-  
+  View(completeData)
+  attach(completeData)
+  subset <- completeData[..., ]
+  detach(completeData)
+  print(nrow(subset))
   # cast the subset and return the result
-  result <- dcast(subset, zipcode ~ hosp_id, sum)
+  result <- dcast(subset, patient_zip ~ hosp_id, sum)
   return(result)
 }
