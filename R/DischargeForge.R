@@ -7,9 +7,10 @@ MeltDischarge <- function(dischargeRaw, fieldNames, dischargeId = FALSE, rowIsDi
   #       0. patient zip code
   #       1. msdrg
   #       2. hospital id
-  #       3. payer description
-  #       4. discharge id
-  #       5. discharge count
+  #       3. hospital name
+  #       4. payer description
+  #       5. discharge id
+  #       6. discharge count
   #     If either discharge_id or discharge_count are implied in the data, their
   #     names should be excluded from the fieldNames argument and the dischargeId
   #     and rowIsDischarge arguments should be set appropriately (see below).
@@ -31,33 +32,33 @@ MeltDischarge <- function(dischargeRaw, fieldNames, dischargeId = FALSE, rowIsDi
   print(class(dischargeRaw))
   # check to see if fieldNames has been properly specified
   if (rowIsDischarge & dischargeId) {
-    if (length(fieldNames) != 5) {
-      len = length(fieldNames)
-      message = paste('Expected 5 values in the fieldnames vector, found', as.character(len), 'values', sep = " ")
-      stop(message)
-    }
-  } else if (rowIsDischarge & !dischargeId) {
-    if (length(fieldNames) != 4) {
-      len = length(fieldNames)
-      message = paste('Expected 4 values in the fieldnames vector, found', as.character(len), 'values', sep = " ")
-      stop(message)
-    }
-  } else if (!rowIsDischarge & !dischargeId) {
-    if (length(fieldNames) != 5) {
-      len = length(fieldNames)
-      message = paste('Expected 5 values in the fieldnames vector, found', as.character(len), 'values', sep = " ")
-      stop(message)
-    }
-  } else if (!rowIsDischarge & dischargeId) {
     if (length(fieldNames) != 6) {
       len = length(fieldNames)
       message = paste('Expected 6 values in the fieldnames vector, found', as.character(len), 'values', sep = " ")
       stop(message)
     }
+  } else if (rowIsDischarge & !dischargeId) {
+    if (length(fieldNames) != 5) {
+      len = length(fieldNames)
+      message = paste('Expected 5 values in the fieldnames vector, found', as.character(len), 'values', sep = " ")
+      stop(message)
+    }
+  } else if (!rowIsDischarge & !dischargeId) {
+    if (length(fieldNames) != 6) {
+      len = length(fieldNames)
+      message = paste('Expected 6 values in the fieldnames vector, found', as.character(len), 'values', sep = " ")
+      stop(message)
+    }
+  } else if (!rowIsDischarge & dischargeId) {
+    if (length(fieldNames) != 7) {
+      len = length(fieldNames)
+      message = paste('Expected 7 values in the fieldnames vector, found', as.character(len), 'values', sep = " ")
+      stop(message)
+    }
   }
   
   # store new field names in a vector
-  updatedFields <- c('patient_zip', 'msdrg', 'hosp_id', 'payer', 'discharge_id', 'discharge_count')
+  updatedFields <- c('patient_zip', 'msdrg', 'hosp_id', 'hosp_name', 'payer', 'discharge_id', 'discharge_count')
   
   # subset the raw data and update field names
   dataSlice <- dischargeRaw[, fieldNames]
@@ -73,7 +74,7 @@ MeltDischarge <- function(dischargeRaw, fieldNames, dischargeId = FALSE, rowIsDi
   # melt the subsetted data and return the result
   names(dataSlice) <- updatedFields
   result <- melt(dataSlice,
-                 id = c('discharge_id', 'hosp_id', 'patient_zip', 'msdrg', 'payer'),
+                 id = c('discharge_id', 'hosp_id', 'hosp_name', 'patient_zip', 'msdrg', 'payer'),
                  measured = c('discharge_count'))
   return(result)
 }
