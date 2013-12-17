@@ -1,68 +1,23 @@
 GenOverlapKey <- function(moltenDischarge,
-                          hospKey,
-                          msdrgKey,
-                          overlapNames=list(),
-                          overlapSysNames=list(),
+                          overlapIds=list(),
                           overlapDefinition) {
   #
   # 
   #
   # Args:
-  #   moltenDischarge: the result of the MeltDischarges function
-  #   hospKey: a data frame key of hospital ids and names
-  #   msdrgKey: a data frame key of MSDRG information
-  #   overlapNames: A list whose length is the number of systems used to define
-  #     the overlap, and whose values are each a list (not a vector) of
-  #     hospital names to included in that system.
-  #   overlapSysNames: Ordered the same as overlapNames, overlapSysNames is a
-  #     list whose length is the number of systems used to define the overlap
-  #     and whose values are the names of the hospital systems.
-  #   overlapDefinition: A function called on a vector of discharges for each
-  #     MSDRG. The function must return a one if the MSDRG is to be considered
-  #     part of the overlap and a 0 if the MSDRG should be excluded from the
-  #     overlap.
+  #
   #
   # Returns:
-  #   
-
-  # constructing id vectors
-  overlapIds <- list()
-  if (length(overlapNames)) {
-    for (i in c(1:length(overlapNames))) {
-      overlapIds[[i]] <- LookupIdByName(hospKey, overlapNames[[i]])
-    }
-  }
-  otherIds <- list()
-  if (length(otherNames)) {
-    for (i in c(1:length(otherNames))) {
-      otherIds[[i]] <- LookupIdByName(hospKey, otherNames[[i]])
-    }
-  }
-  # casting for an msdrg table with all discharges
+  # 
+  
+  # get column subset of molten discharge and cast for sum by msdrg
   subset <- moltenDischarge[, c('discharge_id', 'msdrg', 'hosp_id', 'variable', 'value')]
   casted <- dcast(subset, msdrg ~ hosp_id, sum)
-
-  # generating a 
-  result <- msdrgKey[, c('msdrg', 'msdrg_title', 'msdrg_type', 'ei_def', 'ei_mdc')]
-  total <- data.frame(msdrg=msdrgKey$msdrg)
-  for (i in 1:length(overlapIds)) {
-    sysName <- paste(overlapSysNames[i], "_Total", sep="")
-    sys <- data.frame(msdrg=casted[, c('msdrg')], GroupSystem(casted, overlapIds[[i]], sysName))
-    result <- merge(result, sys, by='msdrg', all=TRUE, sort=TRUE)
-    total <- merge(total, sys[, c(1, length(sys))], by='msdrg', all=TRUE, sort=TRUE)
-  }
-  if (length(overlapIds)) {
-    overlap <- apply(as.matrix(total[, !names(total)%in%c('msdrg')]), 1, FUN=overlapDefinition)
-  }
-  for (i in otherIds) {
-    sysName <- paste(otherSysNames[i], "_Total", sep="")
-    sys <- data.frame(msdrg=casted[, c('msdrg')], GroupSystem(casted, otherIds[[i]], sysName))
-    result <- merge(result, sys, by='msdrg', sort=FALSE, all=TRUE)
-    total <- merge(total, sys[, c(1, length(sys))], by='msdrg', sort=FALSE, all=TRUE)
-  }
-  relTotal <- apply(as.matrix(total[, !names(total)%in%c('msdrg')]), 1, sum)  
-  result <- cbind(result, System_Total=relTotal, Overlap=overlap)
-  return(result)
+  
+  
+  # flag overlap msdrgs
+  overlap <- apply(as.matrix(casted[names(casted) %in% overlapIds]), 1, FUN=overlapDefinition)
+  return(overlap)
 }
 
 GenPayerKey <- function(moltenDischarge, commercialPayers) {
