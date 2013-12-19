@@ -17,6 +17,7 @@ GenOverlapKey <- function(moltenDischarge,
   
   # flag overlap msdrgs
   overlap <- apply(as.matrix(casted[names(casted) %in% overlapIds]), 1, FUN=overlapDefinition)
+  overlapKey <- data.frame(cbind(casted$msdrg, overlap))
   return(overlap)
 }
 
