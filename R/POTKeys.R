@@ -44,8 +44,33 @@ GenPayerKey <- function(moltenDischarge, commercialPayers) {
   return(result)
 }
 
-GenHospKey <- function() {
+GenHospKey <- function(moltenDischarge) {
+  #
+  #
+  #
+  # Args:
+  #
+  #
+  # Returns:
   
+  # subsetting molten data
+  subset <- moltenDischarge[, c('hosp_id', 'hosp_name')]
+  
+  # dropping duplicates
+  result <- unique(subset)
+  
+  # checking if ids or names are duplicated
+  uniqueIds <- unique(moltenDischarge$hosp_id)
+  uniqueNames <- unique(moltenDischarge$hosp_name)
+  if (nrow(result) > length(uniqueIds)) {
+    warning('The hospital key contains more rows than the number of unique hospital ids.')
+  }
+  if (nrow(result) > length(uniqueNames)) {
+    warning('The hospital key contains more rows than the number of unique hospital names.')
+  }  
+  
+  # returning the result
+  return(result)
 }
 
 LookupIdByName <- function(hospKey, hospNames) {
