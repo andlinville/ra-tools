@@ -20,13 +20,14 @@ NewProject <- function(name, hospitalCase) {
   dir.create(paste(name, "documentation", sep="/"))
 }
 
-NewSubProject <- function(subName) {
+NewSubProject <- function(subName, type="none") {
   #
   # Creates a new subproject directory in the working directory.
   #
   # Args:
   #   subName: the name of the subproject. This will also be the name of the
   #   directory
+  #   type: the type of project
   #
   # Returns:
   #   Does not return a value. Creates the directory structure in the current

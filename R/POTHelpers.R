@@ -19,8 +19,19 @@ GroupSystem <- function(castedDischarge, hosps, sysName) {
   return(result)
 }
 
-VertSortPOT <- function(sortCol) {
+GenSorter <- function(castedDischarge, sortCol) {
+  #
+  #
+  #
+  #
+  # Args:
+  #
+  #
+  # Returns:
+  #
   
+  sorter <- order(sortCol, decreasing=TRUE)
+  return(sorter)
 }
 
 GenPotCols <- function(sortedSortCol, sortedTotal){
@@ -68,4 +79,18 @@ SARows <- function(cumCont, sortCol, cutoff) {
     }
   }
   return(saRows)
+}
+
+GenPotSummary <- function(data, sa75Rows, sa90Rows) {
+  #
+  #
+  #
+  #
+  # Args: 
+  #
+  #
+  # Returns:
+  #
+  
+  
 }

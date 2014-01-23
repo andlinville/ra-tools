@@ -106,19 +106,23 @@ CastDischarge <- function(moltenDischarge, payerKey, overlapKey, ...) {
                           zipKey,
                           by.x = c("patient_zip"),
                           by.y = c("zip_code"),
-                          sort = FALSE) 
+                          sort = FALSE,
+                          all.x = TRUE) 
   dataWithMsdrg <- merge(dataWithZipKey,
                         msdrgKey,
                         by = c("msdrg"),
-                        sort = FALSE)
+                        sort = FALSE,
+                        all.x = TRUE)
   dataWithPayerCodes <- merge(dataWithMsdrg,
                         payerKey,
                         by= c('payer'),
-                        sort = FALSE)
+                        sort = FALSE,
+                        all.x = TRUE,)
   dataWithOverlapCode <- merge(dataWithPayerCodes,
                     overlapKey,
-                    by=c('msdrg'),
-                    sort=FALSE)
+                    by = c('msdrg'),
+                    sort = FALSE,
+                    all.x = TRUE)
   completeData <- dataWithOverlapCode
   
   # subset the data
@@ -126,7 +130,7 @@ CastDischarge <- function(moltenDischarge, payerKey, overlapKey, ...) {
   attach(completeData)
   subset <- completeData[..., ]
   detach(completeData)
-  print(nrow(subset))
+  
   # cast the subset and return the result
   result <- dcast(subset, patient_zip ~ hosp_id, sum)
   return(result)
