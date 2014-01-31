@@ -73,6 +73,7 @@ GenHospKey <- function(moltenDischarge) {
   
   # dropping duplicates
   result <- unique(subset)
+  result <- result[order(result$hosp_name), ]
   
   # checking if ids or names are duplicated
   uniqueIds <- unique(moltenDischarge$hosp_id)
