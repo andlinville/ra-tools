@@ -79,7 +79,7 @@ MeltDischarge <- function(dischargeRaw, fieldNames, dischargeId = FALSE, rowIsDi
   return(result)
 }
 
-CastDischarge <- function(moltenDischarge, payerKey, overlapKey, ...) {
+CastDischarge <- function(moltenDischarge, payerKey, overlapKey, subset=.()) {
   # Takes in the output of the Discharge Extract function, and reshapes for 
   # discharges by zip code (vertical) and hospital (horizontal).
   #   
@@ -125,13 +125,7 @@ CastDischarge <- function(moltenDischarge, payerKey, overlapKey, ...) {
                     all.x = TRUE)
   completeData <- dataWithOverlapCode
   
-  # subset the data
-  View(completeData)
-  attach(completeData)
-  subset <- completeData[..., ]
-  detach(completeData)
-  
   # cast the subset and return the result
-  result <- dcast(subset, patient_zip ~ hosp_id, sum)
+  result <- dcast(completeData, patient_zip ~ hosp_id, fun.aggregate=sum, subset=subset, drop=TRUE)
   return(result)
 }
