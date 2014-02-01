@@ -32,7 +32,7 @@ GenOverlapKey <- function(moltenDischarge,
   
   # bind to msdrgs and return
   msdrg <- casted$msdrg
-  overlapKey <- cbind(msdrg, overlap)
+  overlapKey <- data.frame(cbind(msdrg, overlap))
   return(overlapKey)
 }
 
