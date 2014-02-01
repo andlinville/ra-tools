@@ -81,7 +81,7 @@ SARows <- function(cumCont, sortCol, cutoff) {
   return(saRows)
 }
 
-GenPotSummary <- function(data, sa75Rows, sa90Rows) {
+GenPotSummary <- function(casted, overlapIds, sysNames, sortCol, showRight) {
   #
   #
   #
@@ -92,5 +92,25 @@ GenPotSummary <- function(data, sa75Rows, sa90Rows) {
   # Returns:
   #
   
+  # isolating parties
+  parties <- casted[, 'patient_zip']
+  for(i in 1:length(overlapIds)){
+    sys <- GroupSystem(casted, overlapIds[i], sysNames[i])
+    parties <- cbind(parties, sys)
+  }
+  parties_total <- apply(as.matrix(parties[, sysNames]), 1, sum, na.rm=TRUE)
+  parties <- cbind(parties, parties_total)
+  names(parties)[1] <- 'patient_zip'
+  
+  # isolate sort column and generate sorter
+  
+  # isolating other systems
+  other_ids <- names(casted)[!names(casted)%in%names(parties)]
+  others <- casted[, other_ids]
+  
+  
+
+  
+  return(other_ids)
   
 }
