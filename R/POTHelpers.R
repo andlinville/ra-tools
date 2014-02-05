@@ -1,3 +1,26 @@
+GetOtherIds <- function(castedDischargCols, partyIds) {
+  #
+  #
+  #
+  # Args:
+  #
+  #
+  # Returns:
+  #
+  
+  # flatten partyIds
+  parties <- c()
+  for(i in partyIds){
+    parties <- c(parties, i)
+  }
+  
+  # extract others
+  other_ids <- castedDischargeCols[!castedDischargeCol%in%partyIds]
+  
+  # return
+  return(other_ids)
+}
+
 GenPotCols <- function(sortedSortCol, sortedTotal){
   #
   # 
