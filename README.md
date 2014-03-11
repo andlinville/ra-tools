@@ -1,8 +1,6 @@
 ra-tools
 ========
 
-A toolbox for EI Research Associates
-
 ### Description
 
 ra-tools is a set of tools to help streamline basic hospital merger analysis, providing functions for generating and updating the following standard analyses:
